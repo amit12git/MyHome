@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.myhome.controllers;
 
 import java.util.ArrayList;
@@ -12,20 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.*;
 
-import com.myhome.cassandra.MyHome;
-import com.myhome.cassandra.MyHomeRepository;
+import com.myhome.mysql.MyHome;
+import com.myhome.mysql.MyHomeRepository;
 
-/**
- * @author amitabhsinha
- *
- */
 @Controller
 public class MainController {
 	
@@ -33,9 +24,6 @@ public class MainController {
 	
 	@Autowired
 	 MyHomeRepository myHomeRepository;
-	
-	@Autowired
-	ControllerUtily controllerUtily;
 	
 	@RequestMapping("/")
 	public String start(){
@@ -48,7 +36,7 @@ public class MainController {
 		return "isWorking";
 	}
 	
-	@RequestMapping(value ="/myhome",method = RequestMethod.GET)
+	@RequestMapping(value ="/myhomeservice",method = RequestMethod.GET)
 	@ResponseBody
 	public List<MyHome> getMyHomeDetail()
 	 {
@@ -58,38 +46,16 @@ public class MainController {
 	  return homeList;
 	 }
 	
-	@RequestMapping(value ="/myhome/{id}",method = RequestMethod.PUT)
-	@ResponseBody
-	 public Optional<MyHome> updateHome(@RequestBody MyHome myHome, @PathVariable String id)
-	 {
-	  Optional<MyHome> optionalhome = myHomeRepository.findById(id);
-	  logger.info(controllerUtily.readIdDate(id));
-	  if (optionalhome.isPresent()) {
-	  
-		   MyHome home = optionalhome.get();
-		   home.setId(myHome.getId());
-		   home.setName(myHome.getName());
-		   home.setAge(myHome.getAge());
-		   home.setJob(myHome.getJob());
-		   myHomeRepository.save(home);
-	  
-	  }
-	  return optionalhome;
-	 }
 	
-	@RequestMapping(value ="/myhome",method = RequestMethod.POST)
+	
+	@RequestMapping(value ="/myhomeservice",method = RequestMethod.POST)
 	@ResponseBody
 	 public MyHome addHomeDetail(@RequestBody MyHome myHome)
 	 {
-	  String id = String.valueOf(new Random().nextInt());
-	  MyHome home = new MyHome(id, myHome.getName(), myHome.getAge(), myHome.getJob());
+	 // String id = String.valueOf(new Random().nextInt());
+	  MyHome home = new MyHome(myHome.getName(), myHome.getAge(), myHome.getJob());
 	  myHomeRepository.save(home);
-	  controllerUtily.writeDateToHazelCast(home);
 	  return home;
 	 }
-	
-	
-
-	
 
 }
