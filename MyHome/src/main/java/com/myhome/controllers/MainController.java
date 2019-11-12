@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +29,13 @@ import com.myhome.cassandra.MyHomeRepository;
 @Controller
 public class MainController {
 	
+	private final Logger logger = LoggerFactory.getLogger(MainController.class);
+	
 	@Autowired
 	 MyHomeRepository myHomeRepository;
+	
+	@Autowired
+	ControllerUtily controllerUtily;
 	
 	@RequestMapping("/")
 	public String start(){
@@ -46,9 +53,9 @@ public class MainController {
 	public List<MyHome> getMyHomeDetail()
 	 {
 	  Iterable<MyHome> result = myHomeRepository.findAll();
-	  List<MyHome> employeesList = new ArrayList<MyHome>();
-	  result.forEach(employeesList::add);
-	  return employeesList;
+	  List<MyHome> homeList = new ArrayList<MyHome>();
+	  result.forEach(homeList::add);
+	  return homeList;
 	 }
 	
 	@RequestMapping(value ="/myhome/{id}",method = RequestMethod.PUT)
@@ -56,13 +63,16 @@ public class MainController {
 	 public Optional<MyHome> updateEmployee(@RequestBody MyHome myHome, @PathVariable String id)
 	 {
 	  Optional<MyHome> optionalhome = myHomeRepository.findById(id);
+	  logger.info(controllerUtily.readIdDate(id));
 	  if (optionalhome.isPresent()) {
-	   MyHome home = optionalhome.get();
-	   home.setId(myHome.getId());
-	   home.setName(myHome.getName());
-	   home.setAge(myHome.getAge());
-	   home.setJob(myHome.getJob());
-	   myHomeRepository.save(home);
+	  
+		   MyHome home = optionalhome.get();
+		   home.setId(myHome.getId());
+		   home.setName(myHome.getName());
+		   home.setAge(myHome.getAge());
+		   home.setJob(myHome.getJob());
+		   myHomeRepository.save(home);
+	  
 	  }
 	  return optionalhome;
 	 }
@@ -71,11 +81,15 @@ public class MainController {
 	@ResponseBody
 	 public MyHome addEmployee(@RequestBody MyHome myHome)
 	 {
-	  String id = String.valueOf(new Random().nextInt());
-	  MyHome emp = new MyHome(id, myHome.getName(), myHome.getAge(), myHome.getJob());
-	  myHomeRepository.save(emp);
-	  return emp;
+	 // String id = String.valueOf(new Random().nextInt());
+	  MyHome home = new MyHome(myHome.getId(), myHome.getName(), myHome.getAge(), myHome.getJob());
+	  myHomeRepository.save(home);
+	  controllerUtily.writeDateToHazelCast(home);
+	  return home;
 	 }
+	
+	
+
 	
 
 }
