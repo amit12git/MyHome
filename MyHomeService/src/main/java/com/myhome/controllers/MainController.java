@@ -8,6 +8,7 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,14 +17,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.myhome.mysql.MyHome;
 import com.myhome.mysql.MyHomeRepository;
+import com.myhome.rest.RestClientService;
 
 @Controller
 public class MainController {
 	
 	private final Logger logger = LoggerFactory.getLogger(MainController.class);
 	
+	
 	@Autowired
 	 MyHomeRepository myHomeRepository;
+	
+	@Autowired
+	RestClientService restClientService;
+	
+	@Value("${rest.restemplate.url}")
+	private String url;
 	
 	@RequestMapping("/")
 	public String start(){
@@ -55,6 +64,7 @@ public class MainController {
 	 // String id = String.valueOf(new Random().nextInt());
 	  MyHome home = new MyHome(myHome.getName(), myHome.getAge(), myHome.getJob());
 	  myHomeRepository.save(home);
+	  restClientService.getMyHomeResult(url, myHome);
 	  return home;
 	 }
 
